@@ -1,0 +1,8 @@
+.card {
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+:host p-table ::ng-deep .ui-state-highlight {
+  background: red;
+}
