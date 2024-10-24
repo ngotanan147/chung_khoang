@@ -30,6 +30,10 @@
           Code
           <p-sortIcon field="code" />
         </th>
+        <th pSortableColumn="group" style="width: 20%">
+          Group
+          <p-sortIcon field="group" />
+        </th>
         <th pSortableColumn="value1" style="width: 20%">
           Recent Quarter/Year
           <p-sortIcon field="value1" />
@@ -48,6 +52,9 @@
       <tr>
         <td>
           {{ customer.code ?? null }}
+        </td>
+        <td>
+          {{ customer?.group ?? null }}
         </td>
         <td>
           {{ customer.value1 ?? null }}
