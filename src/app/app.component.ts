@@ -2,28 +2,50 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientService } from './core/services/http.service';
 import { HttpClientModule } from '@angular/common/http';
-import { map, of, switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs';
 import { MyTableComponent } from './core/components/my-table/my-table.component';
 import { LoadingService } from './core/services/loading.serivce';
 import { LoadingComponent } from './core/components/loading/loading.component';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HttpClientModule, MyTableComponent, LoadingComponent],
+  imports: [
+    RouterOutlet,
+    HttpClientModule,
+    MyTableComponent,
+    LoadingComponent,
+    CommonModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+  ],
   providers: [HttpClientService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   private _httpService = inject(HttpClientService);
-  // Lợi nhuận sau thuế thu nhập doanh nghiệp: code = 23003
   codeUrl = 'https://mkw-socket-v2.vndirect.com.vn/mkwsocketv2/industrylead';
   data: any[] = [];
+  selectedTime = {
+    label: 'Quarter',
+    value: 'QUARTER',
+  };
+  selectedField = {
+    label: 'Lợi nhuận sau thuế',
+    value: 23003,
+  };
 
   constructor(private loadingService: LoadingService) {}
 
   ngOnInit(): void {
+    this.getData();
+  }
+
+  getData() {
     let codeAndGroupDics: any[] = [];
     this.loadingService.showLoading();
     this._httpService
@@ -38,12 +60,11 @@ export class AppComponent {
               };
             }),
           );
-          console.log(codeAndGroupDics);
           return codeAndGroupDics;
         }),
         switchMap((res: any) => {
           return this._httpService.get(
-            `https://api-finfo.vndirect.com.vn/v4/financial_statements?q=code:${Array.from(res.map((item: any) => item.code)).join(',')}~reportType:QUARTER~modelType:2,90,102,412~fiscalDate:2024-12-31,2024-09-30,2024-06-30,2024-03-31,2023-12-31,2023-09-30,2023-06-30,2023-03-31,2022-12-31~itemCode:23003&sort=fiscalDate&size=1000`,
+            `https://api-finfo.vndirect.com.vn/v4/financial_statements?q=code:${Array.from(res.map((item: any) => item.code)).join(',')}~reportType:${this.selectedTime.value}~modelType:2,90,102,412~fiscalDate:2024-12-31,2024-09-30,2024-06-30,2024-03-31,2023-12-31,2023-09-30,2023-06-30,2023-03-31,2022-12-31~itemCode:${this.selectedField.value}&sort=fiscalDate&size=1000`,
           );
         }),
       )
@@ -55,7 +76,7 @@ export class AppComponent {
             const matchedItem = codeAndGroupDics.find(
               (item1: any) => item1.code === item2.code,
             );
-            return { ...item2, group: matchedItem?.group || 'Unknown' }; // Add group or 'Unknown' if not found
+            return { ...item2, group: matchedItem?.group || 'Unknown' };
           });
           this.loadingService.hideLoading();
         },
@@ -63,6 +84,16 @@ export class AppComponent {
           this.loadingService.hideLoading();
         },
       });
+  }
+
+  onTimeSelectChange(data: any) {
+    this.selectedTime = data;
+    this.getData();
+  }
+
+  onFieldSelectChange(data: any) {
+    this.selectedField = data;
+    this.getData();
   }
 
   transformData(data: any) {

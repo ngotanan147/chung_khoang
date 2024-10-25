@@ -1,3 +1,8 @@
-.my-container {
-  background-color: #FFFFE0;
+.signature-banner {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  color: #3b82f6;
+  font-size: 13px;
 }

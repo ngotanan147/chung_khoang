@@ -1,9 +1,17 @@
+<div class="signature-banner d-flex flex-column">
+  <span>Tool made by dev2k</span>
+  <span>ngotanan147&#64;gmail.com</span>
+</div>
 <div class="my-container">
   <div class="container">
     <div class="mx-auto py-5">
-      <h1 class="text-center">Lợi nhuận sau thuế thu nhập doanh nghiệp</h1>
+      <h1 class="text-center">{{ selectedField.label }}</h1>
     </div>
-    <app-my-table [products]="data"></app-my-table>
+    <app-my-table
+      [products]="data"
+      (timeSelectEmitter)="onTimeSelectChange($event)"
+      (fieldSelectEmitter)="onFieldSelectChange($event)"
+    ></app-my-table>
   </div>
 </div>
 <app-loading></app-loading>

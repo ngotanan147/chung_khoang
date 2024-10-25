@@ -1,4 +1,26 @@
-<div class="card">
+<div>
+  <h5 class="mb-3">Filter options:</h5>
+  <div class="d-flex gap-3">
+    <div class="select flex justify-content-center mb-5">
+      <p-dropdown
+        [options]="timeOptions"
+        [(ngModel)]="selectedTimeOption"
+        (onChange)="onTimeChange()"
+        optionLabel="label"
+      />
+    </div>
+    <div class="select flex justify-content-center mb-5">
+      <p-dropdown
+        [options]="fieldOptions"
+        [(ngModel)]="selectedField"
+        (onChange)="onFieldChange()"
+        optionLabel="label"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="my-table">
   <p-table
     #dt2
     [value]="products"

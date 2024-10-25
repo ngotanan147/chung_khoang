@@ -3,6 +3,23 @@
   margin-inline: auto;
 }
 
-:host p-table ::ng-deep .ui-state-highlight {
-  background: red;
+:host ::ng-deep {
+  .select ol, ul {
+    padding-left: 0 !important;
+  }
+
+  .p-datatable-header {
+    border: 1px solid #ccc;
+    border-bottom: none;
+  }
+}
+
+//.my-table {
+//  border: 1px solid #ccc;
+//}
+
+
+tbody, td, tfoot, th, thead, tr {
+  border-width: thin !important;
+  border-color: #ccc
 }
