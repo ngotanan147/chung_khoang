@@ -43,11 +43,18 @@ export class SearchTableComponent {
 
   // Method to handle filtering
   filterTable(event: Event): void {
+    if (!this.dt2) return;
     const input = event.target as HTMLInputElement; // Use type assertion here
     if (!input.value) {
       this.dt2.filterGlobal('**!*!*', 'contains'); //Return no data
       return;
     }
-    this.dt2.filterGlobal(input.value, 'contains');
+    this.dt2.filterGlobal(input.value.trim(), 'contains');
+  }
+
+  onPaste(event: ClipboardEvent): void {
+    if (!event.clipboardData) return;
+    const pastedValue = event.clipboardData.getData('text');
+    this.dt2.filterGlobal(pastedValue.trim(), 'contains');
   }
 }
