@@ -12,6 +12,13 @@
     border: 1px solid #ccc;
     border-bottom: none;
   }
+
+  .p-datatable-tbody {
+    tr:hover {
+      background: #e5e3e3;
+      cursor: pointer;
+    }
+  }
 }
 
 //.my-table {
@@ -22,4 +29,20 @@
 tbody, td, tfoot, th, thead, tr {
   border-width: thin !important;
   border-color: #ccc
+}
+
+.red {
+  color: #FF2C2C !important;
+}
+
+.green {
+  color: #008000 !important;
+}
+
+.orange {
+  color: #FF5B00 !important
+}
+
+.purple {
+  color: #9D00FF !important;
 }

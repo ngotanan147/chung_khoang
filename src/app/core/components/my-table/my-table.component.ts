@@ -15,32 +15,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 
-const TimeOptions = [
-  {
-    label: 'Year',
-    value: 'ANNUAL',
-  },
-  {
-    label: 'Quarter',
-    value: 'QUARTER',
-  },
-];
-
-const FieldOptions = [
-  {
-    label: 'Lợi nhuận sau thuế',
-    value: 23003,
-  },
-  {
-    label: 'Thu nhập lãi thuần',
-    value: 421900,
-  },
-  {
-    label: 'Tổng doanh thu',
-    value: 21000,
-  },
-];
-
 @Component({
   selector: 'app-my-table',
   standalone: true,
@@ -58,12 +32,10 @@ const FieldOptions = [
 })
 export class MyTableComponent {
   @ViewChild('dt2') dt2!: Table;
-  @Output() timeSelectEmitter: EventEmitter<any> = new EventEmitter<any>();
-  @Output() fieldSelectEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Input() title = '';
   @Input()
   products: any[] = [];
-  timeOptions = TimeOptions;
-  fieldOptions = FieldOptions;
+
   selectedTimeOption = {
     label: 'Quarter',
     value: 'QUARTER',
@@ -83,11 +55,20 @@ export class MyTableComponent {
     this.dt2.filterGlobal(input.value, 'contains');
   }
 
-  onTimeChange(): void {
-    this.timeSelectEmitter.emit(this.selectedTimeOption);
-  }
-
-  onFieldChange(): void {
-    this.fieldSelectEmitter.emit(this.selectedField);
+  selectColor(num: number) {
+    switch (true) {
+      case num >= 100:
+        return 'purple';
+      case num >= 50:
+        return 'orange';
+      case num > 0:
+        return 'green';
+      case num == 0:
+        return '';
+      case num < 0:
+        return 'red';
+      default:
+        return '';
+    }
   }
 }

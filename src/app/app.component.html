@@ -2,16 +2,40 @@
   <span>Tool made by dev2k</span>
   <span>ngotanan147&#64;gmail.com</span>
 </div>
-<div class="my-container">
-  <div class="container">
+
+<div class="filter-option-container">
+  <h5 class="mb-3">Filter options:</h5>
+  <div class="d-flex gap-3">
+    <div class="select flex justify-content-center mb-5">
+      <p-dropdown
+        [options]="timeOptions"
+        [(ngModel)]="selectedTimeOption"
+        (onChange)="onTimeSelectChange()"
+        optionLabel="label"
+      />
+    </div>
+    <div class="select flex justify-content-center mb-5">
+      <p-dropdown
+        [options]="fieldOptions"
+        [(ngModel)]="selectedField"
+        (onChange)="onFieldSelectChange()"
+        optionLabel="label"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="my-container mb-5">
+  <div class="container-fluid">
     <div class="mx-auto py-5">
       <h1 class="text-center">{{ selectedField.label }}</h1>
     </div>
-    <app-my-table
-      [products]="data"
-      (timeSelectEmitter)="onTimeSelectChange($event)"
-      (fieldSelectEmitter)="onFieldSelectChange($event)"
-    ></app-my-table>
+
+    <div class="row gap-3">
+      <div class="col table-container" *ngFor="let item of data">
+        <app-my-table [title]="item[0].group" [products]="item"></app-my-table>
+      </div>
+    </div>
   </div>
 </div>
 <app-loading></app-loading>

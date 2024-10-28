@@ -9,6 +9,34 @@ import { LoadingComponent } from './core/components/loading/loading.component';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
+
+const TimeOptions = [
+  {
+    label: 'Year',
+    value: 'ANNUAL',
+  },
+  {
+    label: 'Quarter',
+    value: 'QUARTER',
+  },
+];
+
+const FieldOptions = [
+  {
+    label: 'Lợi nhuận sau thuế',
+    value: 23003,
+  },
+  {
+    label: 'Thu nhập lãi thuần',
+    value: 421900,
+  },
+  {
+    label: 'Tổng doanh thu',
+    value: 21000,
+  },
+];
 
 @Component({
   selector: 'app-root',
@@ -21,6 +49,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CommonModule,
     BrowserModule,
     BrowserAnimationsModule,
+    DropdownModule,
+    FormsModule,
   ],
   providers: [HttpClientService],
   templateUrl: './app.component.html',
@@ -30,7 +60,7 @@ export class AppComponent {
   private _httpService = inject(HttpClientService);
   codeUrl = 'https://mkw-socket-v2.vndirect.com.vn/mkwsocketv2/industrylead';
   data: any[] = [];
-  selectedTime = {
+  selectedTimeOption = {
     label: 'Quarter',
     value: 'QUARTER',
   };
@@ -38,6 +68,8 @@ export class AppComponent {
     label: 'Lợi nhuận sau thuế',
     value: 23003,
   };
+  timeOptions = TimeOptions;
+  fieldOptions = FieldOptions;
 
   constructor(private loadingService: LoadingService) {}
 
@@ -64,13 +96,12 @@ export class AppComponent {
         }),
         switchMap((res: any) => {
           return this._httpService.get(
-            `https://api-finfo.vndirect.com.vn/v4/financial_statements?q=code:${Array.from(res.map((item: any) => item.code)).join(',')}~reportType:${this.selectedTime.value}~modelType:2,90,102,412~fiscalDate:2024-12-31,2024-09-30,2024-06-30,2024-03-31,2023-12-31,2023-09-30,2023-06-30,2023-03-31,2022-12-31~itemCode:${this.selectedField.value}&sort=fiscalDate&size=1000`,
+            `https://api-finfo.vndirect.com.vn/v4/financial_statements?q=code:${Array.from(res.map((item: any) => item.code)).join(',')}~reportType:${this.selectedTimeOption.value}~modelType:2,90,102,412~fiscalDate:2024-12-31,2024-09-30,2024-06-30,2024-03-31,2023-12-31,2023-09-30,2023-06-30,2023-03-31,2022-12-31~itemCode:${this.selectedField.value}&sort=fiscalDate&size=1000`,
           );
         }),
       )
       .subscribe({
         next: (res: any) => {
-          console.log(this.transformData(res.data));
           this.data = this.transformData(res.data);
           this.data = this.data.map((item2) => {
             const matchedItem = codeAndGroupDics.find(
@@ -78,6 +109,8 @@ export class AppComponent {
             );
             return { ...item2, group: matchedItem?.group || 'Unknown' };
           });
+          this.data = this.groupByKeyAndSort(this.data, 'group');
+          console.log(this.data);
           this.loadingService.hideLoading();
         },
         error: () => {
@@ -86,13 +119,11 @@ export class AppComponent {
       });
   }
 
-  onTimeSelectChange(data: any) {
-    this.selectedTime = data;
+  onTimeSelectChange() {
     this.getData();
   }
 
-  onFieldSelectChange(data: any) {
-    this.selectedField = data;
+  onFieldSelectChange() {
     this.getData();
   }
 
@@ -116,12 +147,10 @@ export class AppComponent {
         if (codeData.length >= 2) {
           // Take the first two records
           const [first, second] = codeData;
-          const percent = (
-            ((first.numericValue - second.numericValue) /
-              Math.abs(parseFloat(first.numericValue))) *
-            100
-          ).toFixed(2);
-
+          const percent = parseFloat(
+            ((first.numericValue / second.numericValue - 1) * 100).toFixed(2),
+          );
+          // (first.numericValue - second.numericValue)
           return {
             code: code,
             group: groupedData?.vietnameseName ?? null,
@@ -129,11 +158,27 @@ export class AppComponent {
               parseFloat((first.numericValue / 1000000000).toFixed(2)) || null, // First value
             value2:
               parseFloat((second.numericValue / 1000000000).toFixed(2)) || null, // Second value
-            percent: parseFloat(percent),
+            percent: percent,
           };
         }
         return null;
       })
       .filter(Boolean); // Filter out any null entries
+  }
+
+  groupByKeyAndSort(array: any, key: any) {
+    // Group by the key first
+    const groupedArray = Object.values(
+      array.reduce((acc: any, curr: any) => {
+        if (!acc[curr[key]]) {
+          acc[curr[key]] = [];
+        }
+        acc[curr[key]].push(curr);
+        return acc;
+      }, {}),
+    );
+
+    // Sort the grouped array by the length of each subarray
+    return groupedArray.sort((a: any, b: any) => b.length - a.length);
   }
 }
