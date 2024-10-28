@@ -36,3 +36,14 @@
 .table-container {
   max-width: 1000px;
 }
+
+.fs-125 {
+  font-size: 1.25rem !important;
+}
+
+.search-table-container {
+  position: fixed;
+  left: 50px;
+  top: 10px;
+  z-index: 1000;
+}

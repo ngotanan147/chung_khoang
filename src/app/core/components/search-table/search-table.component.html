@@ -1,14 +1,29 @@
-<div class="my-table">
+<div class="d-flex align-items-center mb-3">
+  <p-iconField iconPosition="left" class="ml-auto">
+    <p-inputIcon>
+      <i class="pi pi-search"></i>
+    </p-inputIcon>
+    <input
+      pInputText
+      type="text"
+      (input)="filterTable($event)"
+      placeholder="Search Code"
+      [(ngModel)]="searchKey"
+    />
+    <button class="rounded ms-2" pButton (click)="searchKey = ''">Clear</button>
+  </p-iconField>
+</div>
+<div class="search-table" *ngIf="searchKey">
   <p-table
     #dt2
     [value]="products"
     dataKey="id"
     [globalFilterFields]="['code']"
-    [tableStyle]="{ 'min-width': '25rem' }"
+    [tableStyle]="{ 'max-width': '35rem' }"
   >
     <ng-template pTemplate="caption">
       <div>
-        <h4 class="mt-3 text-center">{{ title }}</h4>
+        <h4 class="mt-3 text-center">Search results</h4>
       </div>
     </ng-template>
     <ng-template pTemplate="header">

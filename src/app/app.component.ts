@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientService } from './core/services/http.service';
 import { HttpClientModule } from '@angular/common/http';
@@ -11,6 +11,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
+import { InputIconModule } from 'primeng/inputicon';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputTextModule } from 'primeng/inputtext';
+import { Table } from 'primeng/table';
+import { SearchTableComponent } from './core/components/search-table/search-table.component';
 
 const TimeOptions = [
   {
@@ -51,6 +56,10 @@ const FieldOptions = [
     BrowserAnimationsModule,
     DropdownModule,
     FormsModule,
+    InputIconModule,
+    IconFieldModule,
+    InputTextModule,
+    SearchTableComponent,
   ],
   providers: [HttpClientService],
   templateUrl: './app.component.html',
@@ -58,8 +67,10 @@ const FieldOptions = [
 })
 export class AppComponent {
   private _httpService = inject(HttpClientService);
+  @ViewChild('dt2') dt2!: Table;
   codeUrl = 'https://mkw-socket-v2.vndirect.com.vn/mkwsocketv2/industrylead';
   data: any[] = [];
+  notGroupedData: any[] = [];
   selectedTimeOption = {
     label: 'Quarter',
     value: 'QUARTER',
@@ -109,6 +120,7 @@ export class AppComponent {
             );
             return { ...item2, group: matchedItem?.group || 'Unknown' };
           });
+          this.notGroupedData = this.data;
           this.data = this.groupByKeyAndSort(this.data, 'group');
           console.log(this.data);
           this.loadingService.hideLoading();
@@ -139,31 +151,40 @@ export class AppComponent {
     }, {});
 
     // Perform the transformation
+    // Filter out any null entries
     return Object.keys(groupedData)
       .map((code) => {
+        if (code === 'HNG') {
+          //
+          console.log();
+        }
         const codeData = groupedData[code];
 
         // Ensure we have at least two records to calculate
         if (codeData.length >= 2) {
           // Take the first two records
           const [first, second] = codeData;
+          const value1 = parseFloat(
+            (first.numericValue / 1000000000).toFixed(2),
+          );
+          const value2 = parseFloat(
+            (second.numericValue / 1000000000).toFixed(2),
+          );
           const percent = parseFloat(
-            ((first.numericValue / second.numericValue - 1) * 100).toFixed(2),
+            (((value1 - value2) / Math.abs(value2)) * 100).toFixed(2),
           );
           // (first.numericValue - second.numericValue)
           return {
             code: code,
             group: groupedData?.vietnameseName ?? null,
-            value1:
-              parseFloat((first.numericValue / 1000000000).toFixed(2)) || null, // First value
-            value2:
-              parseFloat((second.numericValue / 1000000000).toFixed(2)) || null, // Second value
+            value1: value1 || null, // First value
+            value2: value2 || null, // Second value
             percent: percent,
           };
         }
         return null;
       })
-      .filter(Boolean); // Filter out any null entries
+      .filter(Boolean);
   }
 
   groupByKeyAndSort(array: any, key: any) {
@@ -180,5 +201,11 @@ export class AppComponent {
 
     // Sort the grouped array by the length of each subarray
     return groupedArray.sort((a: any, b: any) => b.length - a.length);
+  }
+
+  // Method to handle filtering
+  filterTable(event: Event): void {
+    const input = event.target as HTMLInputElement; // Use type assertion here
+    this.dt2.filterGlobal(input.value, 'contains');
   }
 }

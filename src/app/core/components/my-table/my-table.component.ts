@@ -14,6 +14,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
+import { selectColor } from '../../ulti/common.ulti';
 
 @Component({
   selector: 'app-my-table',
@@ -49,26 +50,7 @@ export class MyTableComponent {
 
   ngOnInit() {}
 
-  // Method to handle filtering
-  filterTable(event: Event): void {
-    const input = event.target as HTMLInputElement; // Use type assertion here
-    this.dt2.filterGlobal(input.value, 'contains');
-  }
-
   selectColor(num: number) {
-    switch (true) {
-      case num >= 100:
-        return 'purple';
-      case num >= 50:
-        return 'orange';
-      case num > 0:
-        return 'green';
-      case num == 0:
-        return '';
-      case num < 0:
-        return 'red';
-      default:
-        return '';
-    }
+    return selectColor(num);
   }
 }

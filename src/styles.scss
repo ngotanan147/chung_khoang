@@ -13,3 +13,8 @@ body {
   min-height: calc(100vh);
   background-color: #FFFFE0;
 }
+
+tbody, td, tfoot, th, thead, tr {
+  border-width: thin !important;
+  border-color: #ccc
+}
