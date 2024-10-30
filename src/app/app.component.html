@@ -22,6 +22,14 @@
         optionLabel="label"
       />
     </div>
+    <div class="select flex justify-content-center mb-5">
+      <p-dropdown
+        [options]="groupOptions"
+        [(ngModel)]="selectedGroup"
+        (onChange)="getDataByGroup()"
+        optionLabel="label"
+      />
+    </div>
   </div>
 </div>
 
@@ -39,7 +47,7 @@
     </div>
 
     <div class="row gap-3">
-      <div class="col table-container" *ngFor="let item of data">
+      <div class="col table-container" *ngFor="let item of dataFiltered">
         <app-my-table [title]="item[0].group" [products]="item"></app-my-table>
       </div>
     </div>

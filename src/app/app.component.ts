@@ -16,6 +16,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputTextModule } from 'primeng/inputtext';
 import { Table } from 'primeng/table';
 import { SearchTableComponent } from './core/components/search-table/search-table.component';
+import { group } from '@angular/animations';
 
 const TimeOptions = [
   {
@@ -70,6 +71,7 @@ export class AppComponent {
   @ViewChild('dt2') dt2!: Table;
   codeUrl = 'https://mkw-socket-v2.vndirect.com.vn/mkwsocketv2/industrylead';
   data: any[] = [];
+  dataFiltered: any[] = [];
   notGroupedData: any[] = [];
   selectedTimeOption = {
     label: 'Quarter',
@@ -79,8 +81,13 @@ export class AppComponent {
     label: 'Lợi nhuận sau thuế',
     value: 23003,
   };
+  selectedGroup = {
+    label: 'All',
+    value: 'All',
+  };
   timeOptions = TimeOptions;
   fieldOptions = FieldOptions;
+  groupOptions: any[] = [];
 
   constructor(private loadingService: LoadingService) {}
 
@@ -122,7 +129,10 @@ export class AppComponent {
           });
           this.notGroupedData = this.data;
           this.data = this.groupByKeyAndSort(this.data, 'group');
+          this.getGroupList(this.data);
+          this.getDataByGroup();
           console.log(this.data);
+          console.log(this.groupOptions);
           this.loadingService.hideLoading();
         },
         error: () => {
@@ -137,6 +147,18 @@ export class AppComponent {
 
   onFieldSelectChange() {
     this.getData();
+  }
+
+  getDataByGroup() {
+    if (this.selectedGroup.value === 'All') {
+      this.dataFiltered = this.data;
+    }
+    const groupedData = this.data.find(
+      (item: any) => item[0]?.group === this.selectedGroup.value,
+    );
+    if (groupedData) {
+      this.dataFiltered = [groupedData];
+    }
   }
 
   transformData(data: any) {
@@ -207,5 +229,21 @@ export class AppComponent {
   filterTable(event: Event): void {
     const input = event.target as HTMLInputElement; // Use type assertion here
     this.dt2.filterGlobal(input.value, 'contains');
+  }
+
+  getGroupList(data: any[]) {
+    this.groupOptions = [];
+    this.groupOptions.push({
+      label: 'All',
+      value: 'All',
+    });
+    data.forEach((item: any) => {
+      if (item[0]) {
+        this.groupOptions.push({
+          label: item[0].group,
+          value: item[0].group,
+        });
+      }
+    });
   }
 }
